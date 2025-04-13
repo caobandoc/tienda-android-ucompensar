@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.compensarshop.R
 import com.example.compensarshop.core.adapter.ProductAdapter
-import com.example.compensarshop.core.services.CarService
+import com.example.compensarshop.core.dto.Product
 
-class CarProductFragment(private val carService: CarService) : Fragment() {
+class CarProductFragment(private val productList: List<Product>) : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -23,7 +23,6 @@ class CarProductFragment(private val carService: CarService) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val recyclerView : RecyclerView = view.findViewById(R.id.rv_products)
-        val productList = carService.getProductsCar()
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = ProductAdapter(productList)

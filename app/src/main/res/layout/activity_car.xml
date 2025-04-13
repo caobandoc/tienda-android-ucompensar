@@ -21,7 +21,7 @@
             android:id="@+id/iv_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:contentDescription="@string/retroceder"
+            android:contentDescription="@string/back"
             android:src="@drawable/ic_arrow_back_foreground"
             app:tint="@android:color/white"/>
 
@@ -68,6 +68,7 @@
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />
             <TextView
+                android:id="@+id/tv_total_price"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -81,7 +82,7 @@
             android:id="@+id/btn_buy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/comprar"
+            android:text="@string/buy"
             android:backgroundTint="@color/blue_background"
             android:textSize="20sp"
             android:textColor="@android:color/white"

@@ -21,7 +21,7 @@
             android:id="@+id/iv_search"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:contentDescription="@string/boton_buscar"
+            android:contentDescription="@string/btn_search"
             android:src="@android:drawable/ic_menu_search"
             android:layout_marginEnd="8dp"
             app:tint="@color/blue_primary" />
@@ -33,7 +33,7 @@
             android:layout_height="40dp"
             android:autofillHints="product"
             android:background="@drawable/edit_text_background"
-            android:hint="@string/buscar"
+            android:hint="@string/search"
             android:inputType="text"
             android:paddingHorizontal="12dp"/>
 
@@ -41,7 +41,7 @@
             android:id="@+id/iv_cart"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:contentDescription="@string/carrito_de_compras"
+            android:contentDescription="@string/shopping_cart"
             android:src="@drawable/ic_shopping_cart_foreground"
             android:layout_marginStart="8dp"
             app:tint="@color/blue_primary"/>

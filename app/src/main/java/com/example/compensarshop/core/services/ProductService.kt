@@ -5,7 +5,7 @@ import com.example.compensarshop.core.dto.Product
 class ProductService {
 
     companion object{
-        const val URL_IMAGE = "https://placehold.co/200"
+        const val URL_IMAGE = "https://picsum.photos/200"
         private var instance: ProductService? = null
         private var productList: List<Product> = listOf(
             Product(1,"Producto 1", 10.0, URL_IMAGE),
