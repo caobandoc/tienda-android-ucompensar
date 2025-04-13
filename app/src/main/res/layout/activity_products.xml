@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/blue_light"
+    android:padding="12dp"
+    android:fitsSystemWindows="true">
+
+    <!-- Buscador -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/iv_search"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/boton_buscar"
+            android:src="@android:drawable/ic_menu_search"
+            android:layout_marginEnd="8dp"
+            app:tint="@color/blue_primary" />
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:autofillHints="product"
+            android:background="@drawable/edit_text_background"
+            android:hint="@string/buscar"
+            android:inputType="text"
+            android:paddingHorizontal="12dp"/>
+
+        <ImageView
+            android:id="@+id/iv_cart"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="@string/carrito_de_compras"
+            android:src="@drawable/ic_shopping_cart_foreground"
+            android:layout_marginStart="8dp"
+            app:tint="@color/blue_primary"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fc_products"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

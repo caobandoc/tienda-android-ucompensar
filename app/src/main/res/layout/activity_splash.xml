@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         app:srcCompat="@drawable/ic_logo_foreground"
-        app:tint="@color/blue_background" />
+        app:tint="@color/blue_primary" />
 
     <TextView
         android:id="@+id/tv_app_name"
@@ -25,7 +25,7 @@
         android:layout_height="117dp"
         android:text="@string/compensar_shop"
         android:textAlignment="center"
-        android:textColor="@color/blue_background"
+        android:textColor="@color/blue_primary"
         android:textSize="48sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

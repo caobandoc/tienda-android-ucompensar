@@ -13,17 +13,22 @@
         android:theme="@style/Theme.CompensarShop"
         tools:targetApi="31">
         <activity
-            android:name=".activities.auth.splash.SplashActivity"
+            android:name=".ui.auth.splash.SplashActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.CompensarShop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.auth.login.LoginActivity"
+        <activity android:name=".ui.auth.login.LoginActivity"
+            android:exported="false"/>
+        <activity android:name=".ui.auth.register.RegisterActivity"
+            android:exported="false"/>
+
+        <activity android:name=".ui.app.products.ProductListActivity"
+            android:exported="false"/>
+        <activity android:name=".ui.app.cart.CarActivity"
             android:exported="false"/>
     </application>
 
