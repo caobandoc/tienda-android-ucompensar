@@ -56,6 +56,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.glide)
 
+    implementation(libs.google.play.services.auth)
+
     kapt(libs.glide)
 
     testImplementation(libs.junit)
