@@ -16,10 +16,6 @@ class StoreService private constructor(context: Context) {
         }
     }
 
-    fun getStores(): List<Store> {
-        return storePersistence.getStores()
-    }
-
     fun getStoreById(id: Long): Store? {
         return storePersistence.getStoreById(id)
     }

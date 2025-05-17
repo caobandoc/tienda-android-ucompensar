@@ -3,7 +3,7 @@ package com.example.compensarshop.core.services
 import android.content.Context
 import com.example.compensarshop.core.dto.Product
 
-class CarService private constructor(private val context: Context){
+class CarService private constructor(context: Context){
     companion object{
         private var instance: CarService? = null
 

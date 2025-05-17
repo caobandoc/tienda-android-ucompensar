@@ -17,7 +17,7 @@ import com.example.compensarshop.core.services.CarService
 import java.text.NumberFormat
 import java.util.Locale
 
-class ProductCarAdapter(private val context: Context) :
+class ProductCarAdapter(context: Context) :
     RecyclerView.Adapter<ProductCarAdapter.ProductCarViewHolder>() {
 
     private val carService = CarService.getInstance(context)
