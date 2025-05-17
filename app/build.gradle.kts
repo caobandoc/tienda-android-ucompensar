@@ -23,6 +23,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${getLocalProperty("GOOGLE_WEB_CLIENT_ID")}\"")
+        manifestPlaceholders["MAPS_API_KEY"] = getLocalProperty("MAPS_API_KEY")
     }
 
     buildTypes {
@@ -63,9 +64,13 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.glide)
 
+    //new credentials
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    //Maps
+    implementation(libs.play.services.maps)
 
     kapt(libs.glide)
 

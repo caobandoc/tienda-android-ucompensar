@@ -11,13 +11,27 @@ import com.example.compensarshop.R
 import com.example.compensarshop.core.services.CarService
 import com.example.compensarshop.core.services.ProductService
 import com.example.compensarshop.core.services.StoreService
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import java.text.NumberFormat
+import java.util.Locale
 
-class ItemActivity: AppCompatActivity() {
+class ItemActivity: AppCompatActivity(), OnMapReadyCallback {
     private lateinit var btnAddToCart: Button
     private val carService = CarService.getInstance()
     private val productService = ProductService.getInstance()
     private val storeService = StoreService.getInstance()
     private var productId: Long = -1
+    private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
+
+    // Variable para el mapa
+    private var googleMap: GoogleMap? = null
+    private var storeLocation: LatLng? = null
+    private var storeName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,12 +53,17 @@ class ItemActivity: AppCompatActivity() {
             return
         }
 
+        // Configurar mapa
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
         // Cargar datos del producto
         val product = productService.getProductById(productId)
         product?.let {
             // Mostrar información del producto
             tvProductName.text = it.name
-            tvProductPrice.text = "$${it.price}"
+            tvProductPrice.text = numberFormat.format(it.price)
 
             // Cargar imagen con Glide
             Glide.with(this)
@@ -57,6 +76,13 @@ class ItemActivity: AppCompatActivity() {
                 store?.let { s ->
                     tvStoreName.text = s.name
                     tvStoreAddress.text = s.address
+
+                    // Guardar ubicación de la tienda
+                    storeLocation = LatLng(s.latitude, s.longitude)
+                    storeName = s.name
+
+                    // Configurar mapa
+                    updateMapWithStoreLocation()
                 }
             }
 
@@ -77,6 +103,35 @@ class ItemActivity: AppCompatActivity() {
                     .show()
             }
 
+        }
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+
+        map.uiSettings.apply {
+            isZoomControlsEnabled = true  // Mostrar botones +/- para zoom
+            isZoomGesturesEnabled = true  // Permitir zoom con gestos (pellizcar)
+            isScrollGesturesEnabled = true  // Permitir desplazamiento con dedos
+            isRotateGesturesEnabled = true  // Permitir rotación con gestos
+        }
+
+        updateMapWithStoreLocation()
+    }
+
+    private fun updateMapWithStoreLocation() {
+        // Solo actualizar si tenemos los datos de la tienda y el mapa está listo
+        val location = storeLocation
+        val map = googleMap
+
+        if (location != null && map != null) {
+            map.clear()
+            map.addMarker(MarkerOptions()
+                .position(location)
+                .title(storeName))
+
+            // Mover cámara a la ubicación
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
         }
     }
 
