@@ -1,6 +1,7 @@
 [versions]
 agp = "8.10.0"
 credentials = "1.5.0"
+dataStore = "1.1.6"
 googleid = "1.1.1"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
@@ -21,6 +22,8 @@ playServicesMaps = "19.2.0"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStore" }
+androidx-datastore-proto = { group = "androidx.datastore", name = "datastore", version.ref = "dataStore" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

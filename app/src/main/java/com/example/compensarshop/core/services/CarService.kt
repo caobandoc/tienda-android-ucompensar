@@ -1,18 +1,19 @@
 package com.example.compensarshop.core.services
 
+import android.content.Context
 import com.example.compensarshop.core.dto.Product
 
-class CarService {
+class CarService private constructor(private val context: Context){
     companion object{
         private var instance: CarService? = null
-        private var productService : ProductService = ProductService.getInstance()
 
-        fun getInstance(): CarService {
-            return instance ?: CarService().also { instance = it }
+        fun getInstance(context: Context): CarService {
+            return instance ?: CarService(context.applicationContext).also { instance = it }
         }
     }
 
     private val carItems: MutableMap<Long, Int> = mutableMapOf()
+    private val productService = ProductService.getInstance(context)
 
     // Metodo para obtener los productos del carrito
     fun getProductsCar(): List<Pair<Product, Int>> {

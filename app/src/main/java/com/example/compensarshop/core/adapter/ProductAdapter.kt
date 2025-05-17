@@ -1,5 +1,6 @@
 package com.example.compensarshop.core.adapter
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -18,11 +19,11 @@ import com.example.compensarshop.ui.app.item.ItemActivity
 import java.text.NumberFormat
 import java.util.Locale
 
-class ProductAdapter() :
+class ProductAdapter(context: Context) :
     RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
-    private var productService : ProductService = ProductService.getInstance()
-    private var carService : CarService = CarService.getInstance()
+    private var productService : ProductService = ProductService.getInstance(context)
+    private var carService : CarService = CarService.getInstance(context)
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
 
     // Lista de productos

@@ -1,6 +1,7 @@
 package com.example.compensarshop.core.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +17,10 @@ import com.example.compensarshop.core.services.CarService
 import java.text.NumberFormat
 import java.util.Locale
 
-class ProductCarAdapter() :
+class ProductCarAdapter(private val context: Context) :
     RecyclerView.Adapter<ProductCarAdapter.ProductCarViewHolder>() {
 
-    private val carService = CarService.getInstance()
+    private val carService = CarService.getInstance(context)
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
 
     // Obtener datos del carrito

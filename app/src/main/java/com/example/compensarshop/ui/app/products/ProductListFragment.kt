@@ -1,5 +1,6 @@
 package com.example.compensarshop.ui.app.products
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.compensarshop.R
 import com.example.compensarshop.core.adapter.ProductAdapter
 
-class ProductListFragment() : Fragment() {
+class ProductListFragment(private val context: Context) : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -28,6 +29,6 @@ class ProductListFragment() : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // asigno el adapter
-        recyclerView.adapter = ProductAdapter()
+        recyclerView.adapter = ProductAdapter(context)
     }
 }

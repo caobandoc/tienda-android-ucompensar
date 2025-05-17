@@ -14,11 +14,11 @@ import com.example.compensarshop.core.services.CarService
 import java.text.NumberFormat
 import java.util.Locale
 
-class CarActivity : AppCompatActivity(), ProductCarAdapter.PriceChangeListener {
+class CarActivity() : AppCompatActivity(), ProductCarAdapter.PriceChangeListener {
 
     private lateinit var adapter: ProductCarAdapter
     private lateinit var tvTotalPrice: TextView
-    private val carService = CarService.getInstance()
+    private val carService = CarService.getInstance(this)
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +51,7 @@ class CarActivity : AppCompatActivity(), ProductCarAdapter.PriceChangeListener {
         val recyclerView = findViewById<RecyclerView>(R.id.rv_car_products)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = ProductCarAdapter()
+        adapter = ProductCarAdapter(this)
         adapter.addPriceChangeListener(this)
         recyclerView.adapter = adapter
     }

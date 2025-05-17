@@ -20,11 +20,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import java.text.NumberFormat
 import java.util.Locale
 
-class ItemActivity: AppCompatActivity(), OnMapReadyCallback {
-    private lateinit var btnAddToCart: Button
-    private val carService = CarService.getInstance()
-    private val productService = ProductService.getInstance()
-    private val storeService = StoreService.getInstance()
+class ItemActivity : AppCompatActivity(), OnMapReadyCallback {
+    private lateinit var btnAddToCart : Button
+    private lateinit var carService : CarService
+    private lateinit var productService : ProductService
+    private lateinit var storeService : StoreService
     private var productId: Long = -1
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
 
@@ -36,6 +36,11 @@ class ItemActivity: AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item)
+
+        // Inicializar servicios
+        carService = CarService.getInstance(this)
+        productService = ProductService.getInstance(this)
+        storeService = StoreService.getInstance(this)
 
         // Inicializar vistas
         val ivBack = findViewById<ImageView>(R.id.iv_back)

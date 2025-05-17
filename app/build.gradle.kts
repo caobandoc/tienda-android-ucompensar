@@ -72,6 +72,10 @@ dependencies {
     //Maps
     implementation(libs.play.services.maps)
 
+    //DataStore
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.proto)
+
     kapt(libs.glide)
 
     testImplementation(libs.junit)

@@ -19,7 +19,7 @@ class ProductListActivity : AppCompatActivity(){
 
         // Inicializo el fragmento de la lista de productos
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fc_products, ProductListFragment())
+            .replace(R.id.fc_products, ProductListFragment(this))
             .commit()
 
         // Inicializo el botón de carrito
