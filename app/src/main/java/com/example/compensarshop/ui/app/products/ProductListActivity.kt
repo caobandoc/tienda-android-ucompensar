@@ -9,13 +9,20 @@ import com.example.compensarshop.core.services.ProductService
 import com.example.compensarshop.ui.app.cart.CarActivity
 
 class ProductListActivity : AppCompatActivity(){
+
+    // Variables de la vista
+    private lateinit var imgCar: ImageView
+
+
+    // Inicializo el servicio de productos
+    private var productService: ProductService = ProductService.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Indico el xml que voy a usar
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_products)
 
-        // Inicializo el servicio de productos
-        val productService = ProductService.getInstance();
+        // Obtengo la lista de productos
         val products = productService.getProducts()
 
         // Inicializo el fragmento de la lista de productos
@@ -24,7 +31,7 @@ class ProductListActivity : AppCompatActivity(){
             .commit()
 
         // Inicializo el botón de carrito
-        val imgCar : ImageView = findViewById(R.id.iv_cart)
+        imgCar = findViewById(R.id.iv_cart)
         // Le asigno la acción de abrir el carrito
         imgCar.setOnClickListener {
             val intent = Intent(this, CarActivity::class.java)

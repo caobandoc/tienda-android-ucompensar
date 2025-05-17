@@ -28,10 +28,11 @@
             android:exported="false"/>
         <activity android:name=".ui.auth.register.RegisterActivity"
             android:exported="false"/>
-
-        <activity android:name=".ui.app.products.ProductListActivity"
-            android:exported="false"/>
         <activity android:name=".ui.app.cart.CarActivity"
+            android:exported="false"/>
+        <activity android:name=".ui.app.item.ItemActivity"
+            android:exported="false"/>
+        <activity android:name=".ui.app.products.ProductListActivity"
             android:exported="false"/>
     </application>
 

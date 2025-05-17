@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.compensarshop.R
-import com.example.compensarshop.core.adapter.ProductAdapter
+import com.example.compensarshop.core.adapter.ProductCarAdapter
 import com.example.compensarshop.core.dto.Product
 
 class CarProductFragment(private val productList: List<Product>) : Fragment() {
@@ -25,6 +25,6 @@ class CarProductFragment(private val productList: List<Product>) : Fragment() {
         val recyclerView : RecyclerView = view.findViewById(R.id.rv_products)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = ProductAdapter(productList)
+        recyclerView.adapter = ProductCarAdapter(productList)
     }
 }
