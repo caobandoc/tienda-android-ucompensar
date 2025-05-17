@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.org.jline.utils.InputStreamReader
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("kotlin-kapt")
     alias(libs.plugins.android.application)
@@ -17,6 +21,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${getLocalProperty("GOOGLE_WEB_CLIENT_ID")}\"")
     }
 
     buildTypes {
@@ -37,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -56,7 +63,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.glide)
 
-    implementation(libs.google.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     kapt(libs.glide)
 
@@ -70,4 +79,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+}
+
+fun getLocalProperty(key: String): String {
+    val properties = Properties()
+    val localProperties = File(rootDir, "local.properties")
+    if (localProperties.isFile){
+        properties.load(InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8))
+    }
+    return properties.getProperty(key) ?: ""
 }

@@ -6,25 +6,30 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialException
+import com.example.compensarshop.BuildConfig
 import com.example.compensarshop.R
 import com.example.compensarshop.ui.app.products.ProductListActivity
 import com.example.compensarshop.ui.auth.register.RegisterActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.SignInButton
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity(){
 
     private lateinit var btnLogin: Button
     private lateinit var btnRegister: Button
-    private lateinit var btnGoogleSignIn: SignInButton
-    private lateinit var googleSignInClient: GoogleSignInClient
-    private val RC_SIGN_IN = 123
-    private val TAG = "GoogleSignIn"
+    private lateinit var btnGoogleSignIn: Button
+    private val tag = "GoogleSignIn"
+
+    private lateinit var credentialManager: CredentialManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +39,7 @@ class LoginActivity : AppCompatActivity(){
         btnRegister = findViewById(R.id.btn_register)
         btnGoogleSignIn = findViewById(R.id.btn_google_sign_in)
 
-        //Configurar Google Sign In
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-
+        credentialManager = CredentialManager.create(this)
 
         btnLogin.setOnClickListener {
             navigateToProductList()
@@ -58,28 +57,71 @@ class LoginActivity : AppCompatActivity(){
     }
 
     private fun signIn() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
+        CoroutineScope(Dispatchers.Main).launch {
+            try{
+                // Configurar la opción de Google ID
+                val googleIdOption = GetGoogleIdOption.Builder()
+                    .setFilterByAuthorizedAccounts(false)
+                    .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
+                    .build()
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+                // Crear solicitud de credencial
+                val request = GetCredentialRequest.Builder()
+                    .addCredentialOption(googleIdOption)
+                    .build()
 
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task)
+                // Obtener credenciales
+                val response = credentialManager.getCredential(
+                    request = request,
+                    context = this@LoginActivity
+                )
+
+                handleSignIn(response)
+            } catch (e: GetCredentialException) {
+                Log.e(tag, "Error al obtener credenciales: ${e.message}")
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Error al iniciar sesión con Google",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account = completedTask.getResult(ApiException::class.java)
-            // Inicio de sesión exitoso, redirigir a la pantalla principal
-            navigateToProductList()
-        } catch (e: ApiException) {
-            // Error en el inicio de sesión
-            Log.w(TAG, "signInResult:failed code=" + e.statusCode)
-            Toast.makeText(this, "Error en el inicio de sesión con Google", Toast.LENGTH_SHORT).show()
+    private fun handleSignIn(response: GetCredentialResponse) {
+        val credential = response.credential
+
+        if (credential is CustomCredential &&
+            credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            try {
+                // Parsear el token de Google
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+
+                // Aquí puedes obtener información del usuario
+                val userId = googleIdTokenCredential.idToken
+                val name = googleIdTokenCredential.displayName
+                val profilePictureUri = googleIdTokenCredential.profilePictureUri
+                val email = googleIdTokenCredential.id
+
+                Log.d(tag, "Inicio de sesión exitoso: $name, $email")
+
+                // Navegar a la pantalla principal
+                navigateToProductList()
+            } catch (e: GoogleIdTokenParsingException) {
+                Log.e(tag, "Error al analizar el token: ${e.message}")
+                Toast.makeText(
+                    this,
+                    "Error al procesar la información de Google",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            Log.e(tag, "Tipo de credencial no reconocido")
+            Toast.makeText(
+                this,
+                "Tipo de credencial no compatible",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
