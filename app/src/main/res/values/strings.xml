@@ -23,4 +23,11 @@
     <string name="price">$180.00</string>
     <string name="sign_in_google">Iniciar sesión con Google</string>
     <string name="view">ver</string>
+    <string name="mock_value">$0.00</string>
+    <string name="subtotal">subtotal</string>
+    <string name="remove_item">Borrar</string>
+    <string name="decrease">-</string>
+    <string name="increase">+</string>
+    <string name="mock_quantity">1</string>
+    <string name="mock_name">Nombre del producto</string>
 </resources>

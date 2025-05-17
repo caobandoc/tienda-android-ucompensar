@@ -13,63 +13,28 @@ import com.bumptech.glide.Glide
 import com.example.compensarshop.R
 import com.example.compensarshop.core.dto.Product
 import com.example.compensarshop.core.services.CarService
+import com.example.compensarshop.core.services.ProductService
 import com.example.compensarshop.ui.app.item.ItemActivity
+import java.text.NumberFormat
+import java.util.Locale
 
-class ProductAdapter(private val productList: List<Product>) :
+class ProductAdapter() :
     RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
+    private var productService : ProductService = ProductService.getInstance()
+    private var carService : CarService = CarService.getInstance()
+    private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
+
+    // Lista de productos
+    private var productList: List<Product> = productService.getProducts()
+
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private lateinit var productImage : ImageView
-        private lateinit var productName : TextView
-        private lateinit var productPrice : TextView
-        private lateinit var btnAdd : Button
-        private lateinit var btnView: Button
-
-        // Instancio el servicio de carrito
-        private var carService : CarService = CarService.getInstance()
-
-        fun bind(product: Product) {
-            // busco los elementos del layout
-            productImage = itemView.findViewById(R.id.iv_product_image)
-            productName = itemView.findViewById(R.id.tv_product_name)
-            productPrice = itemView.findViewById(R.id.tv_product_price)
-            btnAdd = itemView.findViewById(R.id.btn_add)
-            btnView = itemView.findViewById(R.id.btn_view)
-
-            productName.text = product.name
-            productPrice.text = "$${product.price}"
-
-            // Asigno la imagen del producto
-            Glide.with(itemView.context)
-                .load(product.urlImage)
-                .into(productImage)
-
-            // Asigno el evento click al boton
-            btnAdd.setOnClickListener {
-                if (carService.addProductToCar(product.id)) {
-                    // Toast indicando que se agrego el producto
-                    Toast.makeText(
-                        itemView.context,
-                        "${product.name} agregado al carrito",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        itemView.context,
-                        "${product.name} ya esta en el carrito",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-            // Asigno el evento click al boton
-            btnView.setOnClickListener {
-                val intent = Intent(itemView.context, ItemActivity::class.java)
-                intent.putExtra("PRODUCT_ID", product.id)
-                itemView.context.startActivity(intent)
-            }
-        }
+        // Referencias a los elementos del layout
+        val productImage: ImageView = itemView.findViewById(R.id.iv_product_image)
+        val productName: TextView = itemView.findViewById(R.id.tv_product_name)
+        val productPrice: TextView = itemView.findViewById(R.id.tv_product_price)
+        val btnAdd: Button = itemView.findViewById(R.id.btn_add)
+        val btnView: Button = itemView.findViewById(R.id.btn_view)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -79,8 +44,42 @@ class ProductAdapter(private val productList: List<Product>) :
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bind(productList[position])
+        val product = productList[position]
+
+        // Configurar los elementos de la vista
+        holder.productName.text = product.name
+        holder.productPrice.text = numberFormat.format(product.price)
+
+        // Cargar imagen con Glide
+        Glide.with(holder.itemView.context)
+            .load(product.urlImage)
+            .into(holder.productImage)
+
+        // Configurar botón añadir
+        holder.btnAdd.setOnClickListener {
+            if (carService.addProductToCar(product.id)) {
+                Toast.makeText(
+                    holder.itemView.context,
+                    "${product.name} agregado al carrito",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    holder.itemView.context,
+                    "El producto ${product.name} ya esta en el carrito",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        // Configurar botón ver
+        holder.btnView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, ItemActivity::class.java)
+            intent.putExtra("PRODUCT_ID", product.id)
+            holder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int = productList.size
+
 }

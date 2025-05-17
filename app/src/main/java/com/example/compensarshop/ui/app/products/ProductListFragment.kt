@@ -9,9 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.compensarshop.R
 import com.example.compensarshop.core.adapter.ProductAdapter
-import com.example.compensarshop.core.dto.Product
 
-class ProductListFragment(private val productList: List<Product>) : Fragment() {
+class ProductListFragment() : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -27,7 +26,8 @@ class ProductListFragment(private val productList: List<Product>) : Fragment() {
 
         // Configuro el recyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
         // asigno el adapter
-        recyclerView.adapter = ProductAdapter(productList)
+        recyclerView.adapter = ProductAdapter()
     }
 }

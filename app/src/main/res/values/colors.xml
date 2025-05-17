@@ -14,4 +14,5 @@
     <color name="blue_secondary">#FF3F768C</color>
     <color name="blue_light">#FF89CAD9</color>
     <color name="blue_background">#FF398CBF</color>
+    <color name="red">#FFB00020</color>
 </resources>
