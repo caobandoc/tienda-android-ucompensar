@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.credentials.CredentialManager
@@ -13,6 +14,7 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import com.example.compensarshop.BuildConfig
 import com.example.compensarshop.R
+import com.example.compensarshop.core.services.LoginService
 import com.example.compensarshop.ui.app.products.ProductListActivity
 import com.example.compensarshop.ui.auth.register.RegisterActivity
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -24,25 +26,31 @@ import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity(){
 
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
     private lateinit var btnLogin: Button
     private lateinit var btnRegister: Button
     private lateinit var btnGoogleSignIn: Button
     private val tag = "GoogleSignIn"
 
     private lateinit var credentialManager: CredentialManager
+    private lateinit var loginService: LoginService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        etEmail = findViewById(R.id.et_user)
+        etPassword = findViewById(R.id.et_password)
         btnLogin = findViewById(R.id.btn_login)
         btnRegister = findViewById(R.id.btn_register)
         btnGoogleSignIn = findViewById(R.id.btn_google_sign_in)
 
         credentialManager = CredentialManager.create(this)
+        loginService = LoginService.getInstance(this)
 
         btnLogin.setOnClickListener {
-            navigateToProductList()
+            loginWithCredentials()
         }
 
         btnRegister.setOnClickListener {
@@ -54,6 +62,24 @@ class LoginActivity : AppCompatActivity(){
             signIn()
         }
 
+    }
+
+    private fun loginWithCredentials(){
+        val email = etEmail.text.toString()
+        val password = etPassword.text.toString()
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Por favor ingrese todos los campos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (loginService.loginWithCredentials(email, password)) {
+            // Navegar a la pantalla principal
+            navigateToProductList()
+            finish()
+        } else {
+            Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun signIn() {
@@ -105,8 +131,18 @@ class LoginActivity : AppCompatActivity(){
 
                 Log.d(tag, "Inicio de sesión exitoso: $name, $email")
 
-                // Navegar a la pantalla principal
-                navigateToProductList()
+                // Autenticar con nuestro servicio
+                if (loginService.loginWithGoogle(email, name.toString(), userId,
+                        profilePictureUri.toString())) {
+                    navigateToProductList()
+                    finish()
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Error al procesar la autenticación de Google",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } catch (e: GoogleIdTokenParsingException) {
                 Log.e(tag, "Error al analizar el token: ${e.message}")
                 Toast.makeText(
