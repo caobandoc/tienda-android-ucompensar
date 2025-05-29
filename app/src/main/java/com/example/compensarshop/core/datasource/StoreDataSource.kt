@@ -1,4 +1,4 @@
-package com.example.compensarshop.core.persistence
+package com.example.compensarshop.core.datasource
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.compensarshop.core.dto.Store
+import com.example.compensarshop.core.repository.StoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -17,7 +18,7 @@ import org.json.JSONObject
 // Extensión para DataStore
 private val Context.storeDataStore: DataStore<Preferences> by preferencesDataStore(name = "stores")
 
-class StorePersistence(private val context: Context) {
+class StoreDataSource(private val context: Context) : StoreRepository {
 
     companion object {
         private val STORES_KEY = stringPreferencesKey("stores_data")
@@ -95,7 +96,7 @@ class StorePersistence(private val context: Context) {
     }
 
     // Obtener tienda por ID
-    fun getStoreById(id: Long): Store? {
+    override suspend fun getStoreById(id: Long): Store? {
         return getStores().find { it.id == id }
     }
 }

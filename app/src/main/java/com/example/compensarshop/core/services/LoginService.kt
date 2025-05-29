@@ -2,12 +2,12 @@ package com.example.compensarshop.core.services
 
 import android.content.Context
 import com.example.compensarshop.core.dto.User
-import com.example.compensarshop.core.persistence.UserPersistence
+import com.example.compensarshop.core.datasource.UserDataSource
 import kotlinx.coroutines.runBlocking
 
 class LoginService private constructor(context: Context) {
 
-    private val userPersistence = UserPersistence(context)
+    private val userDataSource = UserDataSource(context)
 
     companion object {
 
@@ -22,7 +22,7 @@ class LoginService private constructor(context: Context) {
     fun loginWithCredentials(email: String, password: String): Boolean {
         if (email.isEmpty() || password.isEmpty()) return false
 
-        val user = userPersistence.findUserByEmail(email) ?: return false
+        val user = userDataSource.findUserByEmail(email) ?: return false
 
         // Verificar si es usuario local y la contraseña coincide
         if (user.password == password) {
@@ -35,10 +35,10 @@ class LoginService private constructor(context: Context) {
     // Login con Google
     fun loginWithGoogle(email: String, name: String, googleId: String, profilePictureUrl: String?): Boolean {
         // Buscar usuario por Google ID
-        var user = userPersistence.findUserByAuthId(googleId)
+        var user = userDataSource.findUserByAuthId(googleId)
 
         if(user == null){
-            user = userPersistence.findUserByEmail(email)
+            user = userDataSource.findUserByEmail(email)
 
             if(user == null){
                 // Usuario nuevo
@@ -52,7 +52,7 @@ class LoginService private constructor(context: Context) {
                 )
 
                 runBlocking {
-                    userPersistence.saveUser(newUser)
+                    userDataSource.saveUser(newUser)
                 }
             }else{
                 // Existe un usuario, actualizar Google ID
@@ -62,7 +62,7 @@ class LoginService private constructor(context: Context) {
                 )
 
                 runBlocking {
-                    userPersistence.saveUser(updatedUser)
+                    userDataSource.saveUser(updatedUser)
                 }
             }
         }
@@ -80,12 +80,12 @@ class LoginService private constructor(context: Context) {
         )
 
         runBlocking {
-            userPersistence.saveUser(user)
+            userDataSource.saveUser(user)
         }
     }
 
     fun existsUser(email: String): Boolean {
-        return userPersistence.findUserByEmail(email) != null
+        return userDataSource.findUserByEmail(email) != null
     }
 
 

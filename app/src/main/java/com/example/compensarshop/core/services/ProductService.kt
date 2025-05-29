@@ -2,11 +2,11 @@ package com.example.compensarshop.core.services
 
 import android.content.Context
 import com.example.compensarshop.core.dto.Product
-import com.example.compensarshop.core.persistence.ProductPersistence
+import com.example.compensarshop.core.datasource.ProductDataSource
 
 class ProductService private constructor(context: Context){
 
-    private val productPersistence = ProductPersistence(context)
+    private val productDataSource = ProductDataSource(context)
 
     companion object{
         private var instance: ProductService? = null
@@ -17,10 +17,10 @@ class ProductService private constructor(context: Context){
     }
 
     fun getProducts(): List<Product> {
-        return productPersistence.getProducts()
+        return productDataSource.getProducts()
     }
 
     fun getProductById(id: Long): Product? {
-        return productPersistence.getProductById(id)
+        return productDataSource.getProductById(id)
     }
 }

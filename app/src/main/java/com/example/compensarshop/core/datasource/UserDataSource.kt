@@ -1,4 +1,4 @@
-package com.example.compensarshop.core.persistence
+package com.example.compensarshop.core.datasource
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -16,7 +16,7 @@ import org.json.JSONObject
 // Extensión para DataStore
 private val Context.userDataStore: DataStore<Preferences> by preferencesDataStore(name = "users")
 
-class UserPersistence(private val context: Context) {
+class UserDataSource(private val context: Context) {
 
     companion object {
         private val USERS_KEY = stringPreferencesKey("users_data")

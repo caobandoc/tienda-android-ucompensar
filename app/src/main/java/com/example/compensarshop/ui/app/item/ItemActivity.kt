@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.compensarshop.R
 import com.example.compensarshop.core.services.CarService
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -77,18 +79,7 @@ class ItemActivity : AppCompatActivity(), OnMapReadyCallback {
 
             // Cargar información de la tienda si tiene storeId
             it.storeId?.let { storeId ->
-                val store = storeService.getStoreById(storeId)
-                store?.let { s ->
-                    tvStoreName.text = s.name
-                    tvStoreAddress.text = s.address
-
-                    // Guardar ubicación de la tienda
-                    storeLocation = LatLng(s.latitude, s.longitude)
-                    storeName = s.name
-
-                    // Configurar mapa
-                    updateMapWithStoreLocation()
-                }
+                loadStoreData(storeId, tvStoreName, tvStoreAddress)
             }
 
         }
@@ -137,6 +128,28 @@ class ItemActivity : AppCompatActivity(), OnMapReadyCallback {
 
             // Mover cámara a la ubicación
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+        }
+    }
+
+    private fun loadStoreData(storeId: Long, tvStoreName: TextView, tvStoreAddress: TextView) {
+        lifecycleScope.launch {
+            try {
+                val store = storeService.getStoreById(storeId)
+                store?.let { s ->
+                    tvStoreName.text = s.name
+                    tvStoreAddress.text = s.address
+
+                    // Guardar ubicación de la tienda
+                    storeLocation = LatLng(s.latitude, s.longitude)
+                    storeName = s.name
+
+                    // Configurar mapa
+                    updateMapWithStoreLocation()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@ItemActivity, "Error al cargar información de la tienda", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
+            }
         }
     }
 

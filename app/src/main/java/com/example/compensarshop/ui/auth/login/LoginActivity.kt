@@ -105,6 +105,8 @@ class LoginActivity : AppCompatActivity(){
                 handleSignIn(response)
             } catch (e: GetCredentialException) {
                 Log.e(tag, "Error al obtener credenciales: ${e.message}")
+                Log.e(tag, "Tipo de error: ${e.type}")
+
                 Toast.makeText(
                     this@LoginActivity,
                     "Error al iniciar sesión con Google",

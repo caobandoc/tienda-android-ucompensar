@@ -2,11 +2,14 @@ package com.example.compensarshop.core.services
 
 import android.content.Context
 import com.example.compensarshop.core.dto.Store
-import com.example.compensarshop.core.persistence.StorePersistence
+import com.example.compensarshop.core.repository.StoreRepository
+import com.example.compensarshop.core.rest.StoreRestConsumer
 
 class StoreService private constructor(context: Context) {
 
-    private val storePersistence = StorePersistence(context)
+    private val storeRepository : StoreRepository = StoreRestConsumer()
+//    private val storeRepository : StoreRepository = StoreDataSource(context)
+
 
     companion object {
         private var instance: StoreService? = null
@@ -16,8 +19,8 @@ class StoreService private constructor(context: Context) {
         }
     }
 
-    fun getStoreById(id: Long): Store? {
-        return storePersistence.getStoreById(id)
+    suspend fun getStoreById(id: Long): Store? {
+        return storeRepository.getStoreById(id)
     }
 
 }

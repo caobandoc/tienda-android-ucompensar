@@ -1,4 +1,4 @@
-package com.example.compensarshop.core.persistence
+package com.example.compensarshop.core.datasource
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -17,7 +17,7 @@ import org.json.JSONObject
 // Extension para DataStore
 private val Context.productDataStore: DataStore<Preferences> by preferencesDataStore(name = "products")
 
-class ProductPersistence(private val context: Context) {
+class ProductDataSource(private val context: Context) {
     companion object {
         private val PRODUCTS_KEY = stringPreferencesKey("products_data")
         private const val URL_IMAGE = "https://picsum.photos/200"
