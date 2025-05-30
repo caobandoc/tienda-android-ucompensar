@@ -2,12 +2,14 @@ package com.example.compensarshop.core.services
 
 import android.content.Context
 import com.example.compensarshop.core.dto.User
-import com.example.compensarshop.core.datasource.UserDataSource
+import com.example.compensarshop.core.repository.UserRepository
+import com.example.compensarshop.core.rest.UserRestConsumer
 import kotlinx.coroutines.runBlocking
 
 class LoginService private constructor(context: Context) {
 
-    private val userDataSource = UserDataSource(context)
+//    private val userRepository : UserRepository = UserDataSource(context)
+    private val userRepository: UserRepository = UserRestConsumer()
 
     companion object {
 
@@ -19,10 +21,10 @@ class LoginService private constructor(context: Context) {
     }
 
     // Login con credenciales locales
-    fun loginWithCredentials(email: String, password: String): Boolean {
+    suspend fun loginWithCredentials(email: String, password: String): Boolean {
         if (email.isEmpty() || password.isEmpty()) return false
 
-        val user = userDataSource.findUserByEmail(email) ?: return false
+        val user = userRepository.findUserByEmail(email) ?: return false
 
         // Verificar si es usuario local y la contraseña coincide
         if (user.password == password) {
@@ -33,17 +35,16 @@ class LoginService private constructor(context: Context) {
     }
 
     // Login con Google
-    fun loginWithGoogle(email: String, name: String, googleId: String, profilePictureUrl: String?): Boolean {
+    suspend fun loginWithGoogle(email: String, name: String, googleId: String, profilePictureUrl: String?): Boolean {
         // Buscar usuario por Google ID
-        var user = userDataSource.findUserByAuthId(googleId)
+        var user = userRepository.findUserByAuthId(googleId)
 
         if(user == null){
-            user = userDataSource.findUserByEmail(email)
+            user = userRepository.findUserByEmail(email)
 
             if(user == null){
                 // Usuario nuevo
                 val newUser = User(
-                    id = System.currentTimeMillis(),
                     name = name,
                     email = email,
                     password = null,
@@ -52,7 +53,7 @@ class LoginService private constructor(context: Context) {
                 )
 
                 runBlocking {
-                    userDataSource.saveUser(newUser)
+                    userRepository.saveUser(newUser)
                 }
             }else{
                 // Existe un usuario, actualizar Google ID
@@ -62,7 +63,7 @@ class LoginService private constructor(context: Context) {
                 )
 
                 runBlocking {
-                    userDataSource.saveUser(updatedUser)
+                    userRepository.saveUser(updatedUser)
                 }
             }
         }
@@ -71,7 +72,7 @@ class LoginService private constructor(context: Context) {
 
     }
 
-    fun registerUserLocal(name: String, lastName: String, email: String, password: String) {
+    suspend fun registerUserLocal(name: String, lastName: String, email: String, password: String) {
         val user = User(
             id = System.currentTimeMillis(),
             name = "$name $lastName",
@@ -80,12 +81,12 @@ class LoginService private constructor(context: Context) {
         )
 
         runBlocking {
-            userDataSource.saveUser(user)
+            userRepository.saveUser(user)
         }
     }
 
-    fun existsUser(email: String): Boolean {
-        return userDataSource.findUserByEmail(email) != null
+    suspend fun existsUser(email: String): Boolean {
+        return userRepository.findUserByEmail(email) != null
     }
 
 

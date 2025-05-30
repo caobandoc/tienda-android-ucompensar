@@ -1,7 +1,7 @@
 package com.example.compensarshop.core.dto
 
 data class User(
-    val id: Long,
+    val id: Long? = null,
     val name: String,
     val email: String,
     val password: String? = null,

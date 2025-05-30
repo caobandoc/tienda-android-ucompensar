@@ -37,31 +37,19 @@ class ProductCarAdapter(private val context: Context) :
         }
     }
 
-    // Método suspendido para refrescar datos
+    // Metodo suspendido para refrescar datos
     @SuppressLint("NotifyDataSetChanged")
     suspend fun refreshData() {
-        productList = carService.getProductsCar()
+        productList = carService.getProductsCar() ?: emptyList()
         notifyDataSetChanged()
         notifyPriceChangeListeners()
     }
 
-    // Método no suspendido que lanza una corrutina
+    // Metodo no suspendido que lanza una corrutina
     fun updateData() {
         (context as? LifecycleOwner)?.lifecycleScope?.launch {
             refreshData()
         }
-    }
-
-    class ProductCarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // Referencias a los elementos de la vista
-        val productImage: ImageView = itemView.findViewById(R.id.iv_product_image)
-        val productName: TextView = itemView.findViewById(R.id.tv_product_name)
-        val productPrice: TextView = itemView.findViewById(R.id.tv_product_price)
-        val quantity: TextView = itemView.findViewById(R.id.tv_quantity)
-        val subtotal: TextView = itemView.findViewById(R.id.tv_subtotal)
-        val btnIncrease: Button = itemView.findViewById(R.id.btn_increase)
-        val btnDecrease: Button = itemView.findViewById(R.id.btn_decrease)
-        val btnRemove: ImageButton = itemView.findViewById(R.id.btn_remove)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductCarViewHolder {
@@ -113,14 +101,27 @@ class ProductCarAdapter(private val context: Context) :
         }
     }
 
+    // ViewHolder para los productos en el carrito
+    class ProductCarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val productImage: ImageView = itemView.findViewById(R.id.iv_product_image)
+        val productName: TextView = itemView.findViewById(R.id.tv_product_name)
+        val productPrice: TextView = itemView.findViewById(R.id.tv_product_price)
+        val quantity: TextView = itemView.findViewById(R.id.tv_quantity)
+        val subtotal: TextView = itemView.findViewById(R.id.tv_subtotal)
+        val btnIncrease: Button = itemView.findViewById(R.id.btn_increase)
+        val btnDecrease: Button = itemView.findViewById(R.id.btn_decrease)
+        val btnRemove: ImageButton = itemView.findViewById(R.id.btn_remove)
+    }
+
     // Interfaz para notificar cambios en el precio total
     fun interface PriceChangeListener {
         fun onPriceChanged(newTotal: Double)
     }
 
+    // Lista inicializada como vacía, no null
     private val priceChangeListeners = mutableListOf<PriceChangeListener>()
 
-    // Método para agregar un listener
+    // Metodo para agregar un listener
     fun addPriceChangeListener(listener: PriceChangeListener) {
         priceChangeListeners.add(listener)
         // Notificar inmediatamente el precio actual
@@ -131,9 +132,22 @@ class ProductCarAdapter(private val context: Context) :
     }
 
     private suspend fun notifyPriceChangeListeners() {
-        // Notificar a todos los listeners sobre el cambio en el precio total
-        val total = carService.getTotalPrice()
-        priceChangeListeners.forEach { it.onPriceChanged(total) }
+        try {
+            // Notificar a todos los listeners sobre el cambio en el precio total
+            val total = carService.getTotalPrice()
+
+            // Verificar explícitamente que la lista no es nula antes de iterar
+            val listeners = priceChangeListeners
+            if (listeners != null) {
+                for (listener in listeners) {
+                    listener.onPriceChanged(total)
+                }
+            }
+        } catch (e: Exception) {
+            // Log del error para debugging
+            e.printStackTrace()
+
+        }
     }
 
 }

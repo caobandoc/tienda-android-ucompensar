@@ -6,9 +6,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.compensarshop.R
 import com.example.compensarshop.core.services.LoginService
 import com.example.compensarshop.ui.auth.login.LoginActivity
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -20,7 +22,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var btnRegister: Button
 
     private lateinit var loginService: LoginService
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,16 +62,30 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        if (loginService.existsUser(email)){
-            Toast.makeText(this, "El correo ya está registrado", Toast.LENGTH_SHORT).show()
-            return
+        // Lanzar corrutina para operaciones suspendidas
+        lifecycleScope.launch {
+            try {
+                if (loginService.existsUser(email)) {
+                    Toast.makeText(this@RegisterActivity, "El correo ya está registrado", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                loginService.registerUserLocal(name, lastName, email, password)
+
+                // Informar al usuario que el registro fue exitoso
+                Toast.makeText(this@RegisterActivity, "Usuario registrado con éxito", Toast.LENGTH_SHORT).show()
+
+                // Navigate to login screen
+                val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@RegisterActivity,
+                    "Error al registrar: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
-
-        loginService.registerUserLocal(name, lastName, email, password)
-
-        // Navigate to login screen or show success message
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }

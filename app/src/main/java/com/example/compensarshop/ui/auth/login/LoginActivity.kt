@@ -12,6 +12,7 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.lifecycle.lifecycleScope
 import com.example.compensarshop.BuildConfig
 import com.example.compensarshop.R
 import com.example.compensarshop.core.services.LoginService
@@ -20,8 +21,6 @@ import com.example.compensarshop.ui.auth.register.RegisterActivity
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity(){
@@ -61,10 +60,9 @@ class LoginActivity : AppCompatActivity(){
         btnGoogleSignIn.setOnClickListener {
             signIn()
         }
-
     }
 
-    private fun loginWithCredentials(){
+    private fun loginWithCredentials() {
         val email = etEmail.text.toString()
         val password = etPassword.text.toString()
 
@@ -73,18 +71,25 @@ class LoginActivity : AppCompatActivity(){
             return
         }
 
-        if (loginService.loginWithCredentials(email, password)) {
-            // Navegar a la pantalla principal
-            navigateToProductList()
-            finish()
-        } else {
-            Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            try {
+                if (loginService.loginWithCredentials(email, password)) {
+                    // Navegar a la pantalla principal
+                    navigateToProductList()
+                    finish()
+                } else {
+                    Toast.makeText(this@LoginActivity, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("LoginActivity", "Error al iniciar sesión: ${e.message}")
+                Toast.makeText(this@LoginActivity, "Error al iniciar sesión", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun signIn() {
-        CoroutineScope(Dispatchers.Main).launch {
-            try{
+        lifecycleScope.launch {
+            try {
                 // Configurar la opción de Google ID
                 val googleIdOption = GetGoogleIdOption.Builder()
                     .setFilterByAuthorizedAccounts(false)
@@ -134,16 +139,32 @@ class LoginActivity : AppCompatActivity(){
                 Log.d(tag, "Inicio de sesión exitoso: $name, $email")
 
                 // Autenticar con nuestro servicio
-                if (loginService.loginWithGoogle(email, name.toString(), userId,
-                        profilePictureUri.toString())) {
-                    navigateToProductList()
-                    finish()
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Error al procesar la autenticación de Google",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                lifecycleScope.launch {
+                    try {
+                        if (loginService.loginWithGoogle(
+                                email,
+                                name.toString(),
+                                userId,
+                                profilePictureUri.toString()
+                            )
+                        ) {
+                            navigateToProductList()
+                            finish()
+                        } else {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "Error al procesar la autenticación de Google",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(tag, "Error al procesar la autenticación: ${e.message}")
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Error al procesar la autenticación",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             } catch (e: GoogleIdTokenParsingException) {
                 Log.e(tag, "Error al analizar el token: ${e.message}")
@@ -167,5 +188,4 @@ class LoginActivity : AppCompatActivity(){
         val intent = Intent(this, ProductListActivity::class.java)
         startActivity(intent)
     }
-
 }
