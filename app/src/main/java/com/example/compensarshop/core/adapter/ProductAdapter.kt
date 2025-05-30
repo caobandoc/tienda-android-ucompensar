@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.compensarshop.R
@@ -16,6 +18,7 @@ import com.example.compensarshop.core.dto.Product
 import com.example.compensarshop.core.services.CarService
 import com.example.compensarshop.core.services.ProductService
 import com.example.compensarshop.ui.app.item.ItemActivity
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -27,7 +30,23 @@ class ProductAdapter(context: Context) :
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
 
     // Lista de productos
-    private var productList: List<Product> = productService.getProducts()
+    private var productList: List<Product> = emptyList()
+
+    // Inicializar con datos
+    init {
+        (context as? LifecycleOwner)?.lifecycleScope?.launch {
+            updateProducts()
+        }
+    }
+
+    suspend fun updateProducts() {
+        try {
+            productList = productService.getProducts()
+            notifyDataSetChanged()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // Referencias a los elementos del layout

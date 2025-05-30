@@ -6,11 +6,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.compensarshop.R
 import com.example.compensarshop.core.adapter.ProductCarAdapter
 import com.example.compensarshop.core.services.CarService
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -44,7 +46,6 @@ class CarActivity() : AppCompatActivity(), ProductCarAdapter.PriceChangeListener
                 Toast.makeText(this, "No hay productos en el carrito", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
     private fun setupRecyclerView() {
@@ -58,25 +59,30 @@ class CarActivity() : AppCompatActivity(), ProductCarAdapter.PriceChangeListener
 
     override fun onPriceChanged(newTotal: Double) {
         // Actualizar el precio total en la vista
-        updateTotalPrice()
+        tvTotalPrice.text = numberFormat.format(newTotal)
     }
 
     private fun updateTotalPrice() {
-        // Actualizar el precio total en la vista
-        tvTotalPrice.text = numberFormat.format(carService.getTotalPrice())
+        // Actualizar el precio total usando una corrutina
+        lifecycleScope.launch {
+            val total = carService.getTotalPrice()
+            tvTotalPrice.text = numberFormat.format(total)
+        }
     }
 
     private fun showPurchaseConfirmation() {
-        AlertDialog.Builder(this)
-            .setTitle("Confirmar compra")
-            .setMessage("¿Deseas finalizar tu compra por ${numberFormat.format(carService.getTotalPrice())}?")
-            .setPositiveButton("Comprar") { _, _ ->
-                Toast.makeText(this, "Compra realizada con éxito", Toast.LENGTH_SHORT).show()
-                carService.clearCar()
-                finish()
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        lifecycleScope.launch {
+            val totalPrice = carService.getTotalPrice()
+            AlertDialog.Builder(this@CarActivity)
+                .setTitle("Confirmar compra")
+                .setMessage("¿Deseas finalizar tu compra por ${numberFormat.format(totalPrice)}?")
+                .setPositiveButton("Comprar") { _, _ ->
+                    Toast.makeText(this@CarActivity, "Compra realizada con éxito", Toast.LENGTH_SHORT).show()
+                    carService.clearCar()
+                    finish()
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
     }
-
 }

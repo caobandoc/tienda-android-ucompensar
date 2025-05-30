@@ -16,11 +16,15 @@ class CarService private constructor(context: Context){
     private val productService = ProductService.getInstance(context)
 
     // Metodo para obtener los productos del carrito
-    fun getProductsCar(): List<Pair<Product, Int>> {
-        return carItems.map { (id, quantity) ->
+    suspend fun getProductsCar(): List<Pair<Product, Int>> {
+        val result = mutableListOf<Pair<Product, Int>>()
+        for ((id, quantity) in carItems) {
             val product = productService.getProductById(id)
-            Pair(product!!, quantity)
+            product?.let {
+                result.add(Pair(it, quantity))
+            }
         }
+        return result
     }
 
     // Metodo para agregar un producto al carrito
@@ -70,11 +74,13 @@ class CarService private constructor(context: Context){
         carItems.clear()
     }
 
-    fun getTotalPrice(): Double {
-        return carItems.entries.sumOf { (id, quantity) ->
+    suspend fun getTotalPrice(): Double {
+        var total = 0.0
+        for ((id, quantity) in carItems) {
             val price = productService.getProductById(id)?.price ?: 0.0
-            price * quantity
+            total += price * quantity
         }
+        return total
     }
 
     fun getCarItemCount(): Int {

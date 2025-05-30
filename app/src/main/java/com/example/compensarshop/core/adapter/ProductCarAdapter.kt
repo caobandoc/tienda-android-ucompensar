@@ -9,28 +9,47 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.compensarshop.R
 import com.example.compensarshop.core.dto.Product
 import com.example.compensarshop.core.services.CarService
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
-class ProductCarAdapter(context: Context) :
+class ProductCarAdapter(private val context: Context) :
     RecyclerView.Adapter<ProductCarAdapter.ProductCarViewHolder>() {
 
     private val carService = CarService.getInstance(context)
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
 
-    // Obtener datos del carrito
-    private var productList: List<Pair<Product, Int>> = carService.getProductsCar()
+    // Lista de productos en el carrito
+    private var productList: List<Pair<Product, Int>> = emptyList()
 
-    // Metodo para refrescar datos
-    @SuppressLint("NotifyDataSetChanged") // no es lo ideal, pero es una forma rápida de refrescar la vista
-    fun refreshData() {
+    // Inicializar datos
+    init {
+        // Verificar si el contexto es un LifecycleOwner para usar lifecycleScope
+        (context as? LifecycleOwner)?.lifecycleScope?.launch {
+            refreshData()
+        }
+    }
+
+    // Método suspendido para refrescar datos
+    @SuppressLint("NotifyDataSetChanged")
+    suspend fun refreshData() {
         productList = carService.getProductsCar()
         notifyDataSetChanged()
+        notifyPriceChangeListeners()
+    }
+
+    // Método no suspendido que lanza una corrutina
+    fun updateData() {
+        (context as? LifecycleOwner)?.lifecycleScope?.launch {
+            refreshData()
+        }
     }
 
     class ProductCarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -74,23 +93,23 @@ class ProductCarAdapter(context: Context) :
         // Configurar botones
         // Aumentar cantidad
         holder.btnIncrease.setOnClickListener {
-            carService.increaseProductQuantity(product.id)
-            refreshData()
-            notifyPriceChangeListeners()
+            if (carService.increaseProductQuantity(product.id)) {
+                updateData()
+            }
         }
 
         // Disminuir cantidad
         holder.btnDecrease.setOnClickListener {
-            carService.decreaseProductQuantity(product.id)
-            refreshData()
-            notifyPriceChangeListeners()
+            if (carService.decreaseProductQuantity(product.id)) {
+                updateData()
+            }
         }
 
         // Eliminar producto
         holder.btnRemove.setOnClickListener {
-            carService.removeProductFromCar(product.id)
-            refreshData()
-            notifyPriceChangeListeners()
+            if (carService.removeProductFromCar(product.id)) {
+                updateData()
+            }
         }
     }
 
@@ -101,12 +120,17 @@ class ProductCarAdapter(context: Context) :
 
     private val priceChangeListeners = mutableListOf<PriceChangeListener>()
 
-    // Metodo para agregar un listener
+    // Método para agregar un listener
     fun addPriceChangeListener(listener: PriceChangeListener) {
         priceChangeListeners.add(listener)
+        // Notificar inmediatamente el precio actual
+        (context as? LifecycleOwner)?.lifecycleScope?.launch {
+            val total = carService.getTotalPrice()
+            listener.onPriceChanged(total)
+        }
     }
 
-    private fun notifyPriceChangeListeners() {
+    private suspend fun notifyPriceChangeListeners() {
         // Notificar a todos los listeners sobre el cambio en el precio total
         val total = carService.getTotalPrice()
         priceChangeListeners.forEach { it.onPriceChanged(total) }

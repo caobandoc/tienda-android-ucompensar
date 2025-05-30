@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.compensarshop.core.dto.Product
+import com.example.compensarshop.core.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -17,7 +18,7 @@ import org.json.JSONObject
 // Extension para DataStore
 private val Context.productDataStore: DataStore<Preferences> by preferencesDataStore(name = "products")
 
-class ProductDataSource(private val context: Context) {
+class ProductDataSource(private val context: Context) : ProductRepository{
     companion object {
         private val PRODUCTS_KEY = stringPreferencesKey("products_data")
         private const val URL_IMAGE = "https://picsum.photos/200"
@@ -55,7 +56,7 @@ class ProductDataSource(private val context: Context) {
     }
 
     // Obtener productos
-    fun getProducts(): List<Product> = runBlocking {
+    override suspend fun getProducts(): List<Product> = runBlocking {
         val productsFlow: Flow<List<Product>> = context.productDataStore.data.map { preferences ->
             val productsJson = preferences[PRODUCTS_KEY]
             if (productsJson.isNullOrEmpty()) {
@@ -82,7 +83,7 @@ class ProductDataSource(private val context: Context) {
     }
 
     // Obtener producto por ID
-    fun getProductById(id: Long): Product? {
+    override suspend fun getProductById(id: Long): Product? {
         return getProducts().find { it.id == id }
     }
 }

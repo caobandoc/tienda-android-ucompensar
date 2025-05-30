@@ -66,22 +66,29 @@ class ItemActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         // Cargar datos del producto
-        val product = productService.getProductById(productId)
-        product?.let {
-            // Mostrar información del producto
-            tvProductName.text = it.name
-            tvProductPrice.text = numberFormat.format(it.price)
+        lifecycleScope.launch {
+            try {
+                val product = productService.getProductById(productId)
 
-            // Cargar imagen con Glide
-            Glide.with(this)
-                .load(it.urlImage)
-                .into(ivProductImage)
+                product?.let {
+                    // Mostrar información del producto
+                    tvProductName.text = it.name
+                    tvProductPrice.text = numberFormat.format(it.price)
 
-            // Cargar información de la tienda si tiene storeId
-            it.storeId?.let { storeId ->
-                loadStoreData(storeId, tvStoreName, tvStoreAddress)
+                    // Cargar imagen con Glide
+                    Glide.with(this@ItemActivity)
+                        .load(it.urlImage)
+                        .into(ivProductImage)
+
+                    // Cargar información de la tienda si tiene storeId
+                    it.storeId?.let { storeId ->
+                        loadStoreData(storeId, tvStoreName, tvStoreAddress)
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@ItemActivity, "Error al cargar el producto", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
             }
-
         }
 
         // Configurar evento de botón volver
